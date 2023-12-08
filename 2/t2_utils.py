@@ -26,8 +26,8 @@ def relevance(query_genre: [str], track_genre: [str]) -> int:
 # https://wikimedia.org/api/rest_v1/media/math/render/svg/3efe45491d555db398ed663107460f81d6ecaf1e
 def dcg(top_rel: [int]) -> int:
     dcg = top_rel[0]
-    for i in range(2, len(top_rel)+1):
-        dcg += top_rel[i-1] / np.log2(i + 1) 
+    for i in range(1, len(top_rel)):
+        dcg += top_rel[i] / np.log2(i + 1)
     return dcg
 
 def shannons_entropy(dist: [int]) -> int:
