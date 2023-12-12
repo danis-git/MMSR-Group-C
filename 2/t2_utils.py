@@ -25,9 +25,9 @@ def relevance(query_genre: [str], track_genre: [str]) -> int:
 
 # https://wikimedia.org/api/rest_v1/media/math/render/svg/3efe45491d555db398ed663107460f81d6ecaf1e
 def dcg(top_rel: [int]) -> int:
-    dcg = top_rel[0]
-    for i in range(1, len(top_rel)):
-        dcg += top_rel[i] / np.log2(i + 1)
+    dcg = 0
+    for i in range(1, len(top_rel)+1):
+        dcg += top_rel[i-1] / np.log2(i + 1)
     return dcg
 
 def shannons_entropy(dist: [int]) -> int:
@@ -55,13 +55,15 @@ def evaluation_pipeline(df_info: pd.DataFrame, df_feature: pd.DataFrame, sim_fun
     unique_genres = set(genres) # get all the unique genres of the dataset
     metrics = df_info.apply(calc_metrics, axis=1, args=(df_info, df_feature, unique_genres, k, sim_func, random))
     
-    avg_precision = np.mean([items[0] for items in metrics], axis=0) # computes each average precision from 0 to k
-    avg_recall= np.mean([items[1] for items in metrics], axis=0) # computes each average recall from 0 to k
+    avg_precision_list = np.mean([items[0] for items in metrics], axis=0) # computes each average precision from 0 to 100
+    avg_precision = avg_precision_list[k-1]
+    avg_recall_list = np.mean([items[1] for items in metrics], axis=0) # computes each average recall from 0 to 100
+    avg_recall = avg_recall_list[k-1]
     avg_ndcg = np.mean([items[2] for items in metrics])
     avg_genre_diversity = np.mean([items[3] for items in metrics])
     retr_uniq_genres = set().union(*[items[4] for items in metrics]) # combines the genres from the retrieved songs into a single set to keep the unique ones
     genre_coverage = len(retr_uniq_genres)/len(unique_genres)
-    return [avg_precision, avg_recall, avg_ndcg, avg_genre_diversity, genre_coverage]
+    return [avg_precision_list, avg_recall_list, avg_precision, avg_recall, avg_ndcg, avg_genre_diversity, genre_coverage]
 
 def calc_metrics(row, df_info: pd.DataFrame, df_feature: pd.DataFrame, unique_genres: [str], k: int, sim_func, random = False):
     song_id = row["id"]
@@ -74,15 +76,15 @@ def calc_metrics(row, df_info: pd.DataFrame, df_feature: pd.DataFrame, unique_ge
     if song_id == "XWfDJYP0AIVHgsrk":
         print("nearly half")
     
-    df_retr_songs = song_retrieval(df_info, df_feature, song_title, song_artist, k, sim_func = sim_func, random = random)
+    df_retr_songs = song_retrieval(df_info, df_feature, song_title, song_artist, 100, sim_func = sim_func, random = random)
  
     # compute precision and recall
     rel_songs_mask = df_retr_songs["genre"].apply(lambda x: any(np.intersect1d(song_genre, x))) # first get a vector of 0 and 1 where 1 means that the song in the df is relevant to the query song
-    rel_cumsum = np.cumsum(rel_songs_mask) # do cumulative sum to compute precision and recall for intervall [0, k]
+    rel_cumsum = np.cumsum(rel_songs_mask) # do cumulative sum to compute precision and recall for intervall [0, 100]
     precision_list = rel_cumsum/range(1, len(rel_cumsum)+1)  # divide every entry by their index in the array to get the precision
     recall_list = rel_cumsum/rel_count # divide every entry by the total relevance count to get the recall
     
-    df_retr_songs = df_retr_songs[:10] # select the first 10 elements for further processing
+    df_retr_songs = df_retr_songs[:k] # select the first k elements for further processing
 
     # compute ndcg
     retr_rel = df_retr_songs["genre"].apply(lambda x: relevance(x, song_genre)).values
@@ -94,7 +96,7 @@ def calc_metrics(row, df_info: pd.DataFrame, df_feature: pd.DataFrame, unique_ge
  
     for genre in retr_genres:
         df_genre[genre] += 1/len(genre)
-    norm_genre_dist = df_genre.iloc[0].values / 10 # normalize the genre distribution
+    norm_genre_dist = df_genre.iloc[0].values / k # normalize the genre distribution
     genre_diversity = shannons_entropy(norm_genre_dist)
     
     return [precision_list, recall_list, song_ndcg, genre_diversity, set(np.concatenate(retr_genres, axis=None))]
