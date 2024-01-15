@@ -59,11 +59,12 @@ def song_retrieval(df_info: pd.DataFrame, df_feature: pd.DataFrame, title: str, 
            1:n + 1] if limit else info_feature_sorted  # skips the first row, because it is the query track
 
 def late_fusion_retrieval(df_info: pd.DataFrame, df_feature1: pd.DataFrame, df_feature2: pd.DataFrame, title: str,
-                          artist: str, n: int, alpha: float, beta: float) -> pd.DataFrame:
-    df1 = utils.song_retrieval(df_info, df_feature1, title, artist,
-                               n, utils.cos_sim, filter=["id", "artist", "song", "sim"], limit=False)
-    df2 = utils.song_retrieval(df_info, df_feature2, title, artist,
-                               n, utils.cos_sim, filter=["id", "artist", "song", "sim"], limit=False)
+                          artist: str, n: int, alpha=0.5, beta=0.5) -> pd.DataFrame:
+
+    df1 = song_retrieval(df_info, df_feature1, title, artist,
+                               n, cos_sim, filter=["id", "artist", "song", "sim"], limit=False)
+    df2 = song_retrieval(df_info, df_feature2, title, artist,
+                               n, cos_sim, filter=["id", "artist", "song", "sim"], limit=False)
     # sim scores are already normalized
     merged_df = pd.merge(df1, df2, on="id", how="outer", suffixes=("_df1", "_df2"))
     weighted_sum_df = pd.DataFrame({
