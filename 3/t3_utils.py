@@ -62,24 +62,26 @@ def late_fusion_retrieval(df_info: pd.DataFrame, df_feature1: pd.DataFrame, df_f
                           artist: str, n: int, alpha=0.5, beta=0.5) -> pd.DataFrame:
 
     df1 = song_retrieval(df_info, df_feature1, title, artist,
-                               n, cos_sim, filter=["id", "artist", "song", "sim"], limit=False)
+                               n, cos_sim, limit=False)
     df2 = song_retrieval(df_info, df_feature2, title, artist,
-                               n, cos_sim, filter=["id", "artist", "song", "sim"], limit=False)
+                               n, cos_sim, limit=False)
+
     # sim scores are already normalized
     merged_df = pd.merge(df1, df2, on="id", how="outer", suffixes=("_df1", "_df2"))
     weighted_sum_df = pd.DataFrame({
         "id": merged_df["id"],
         "artist": merged_df["artist_df1"],
         "song": merged_df["song_df1"],
+        "genre": merged_df["genre_df1"],
         "sim": (alpha * merged_df["sim_df1"]) + (beta * merged_df["sim_df2"])
     })
     df_sorted = weighted_sum_df.sort_values(by=["sim"], ascending=False)
     return df_sorted[1:n + 1]
 
-def evaluation_pipeline(df_info: pd.DataFrame, df_feature: pd.DataFrame, sim_func, k:int, random = False):
+def evaluation_pipeline(df_info: pd.DataFrame, df_feature: pd.DataFrame, sim_func, k:int, random = False, df_feature2 = None):
     genres = df_info.explode("genre")["genre"].values
     unique_genres = set(genres) # get all the unique genres of the dataset
-    metrics = df_info.apply(calc_metrics, axis=1, args=(df_info, df_feature, unique_genres, k, sim_func, random))
+    metrics = df_info.apply(calc_metrics, axis=1, args=(df_info, df_feature, unique_genres, k, sim_func, random, df_feature2))
     
     avg_precision_list = np.mean([items[0] for items in metrics], axis=0) # computes each average precision from 0 to 100
     avg_precision = avg_precision_list[k-1]
@@ -91,7 +93,7 @@ def evaluation_pipeline(df_info: pd.DataFrame, df_feature: pd.DataFrame, sim_fun
     genre_coverage = len(retr_uniq_genres)/len(unique_genres)
     return [avg_precision_list, avg_recall_list, avg_precision, avg_recall, avg_ndcg, avg_genre_diversity, genre_coverage]
 
-def calc_metrics(row, df_info: pd.DataFrame, df_feature: pd.DataFrame, unique_genres: [str], k: int, sim_func, random = False):
+def calc_metrics(row, df_info: pd.DataFrame, df_feature: pd.DataFrame, unique_genres: [str], k: int, sim_func, random = False, df_feature2 = None):
     song_id = row["id"]
     song_artist = row["artist"]
     song_title = row["song"]
@@ -101,8 +103,10 @@ def calc_metrics(row, df_info: pd.DataFrame, df_feature: pd.DataFrame, unique_ge
     
     if song_id == "XWfDJYP0AIVHgsrk":
         print("nearly half")
-    
-    df_retr_songs = song_retrieval(df_info, df_feature, song_title, song_artist, 100, sim_func = sim_func, random = random)
+
+    df_retr_songs = (song_retrieval(df_info, df_feature, song_title, song_artist, 100, sim_func = sim_func, random = random)
+        if df_feature2 is None 
+        else late_fusion_retrieval(df_info, df_feature, df_feature2, song_title, song_artist, 100))
  
     # compute precision and recall
     rel_songs_mask = df_retr_songs["genre"].apply(lambda x: any(np.intersect1d(song_genre, x))) # first get a vector of 0 and 1 where 1 means that the song in the df is relevant to the query song
