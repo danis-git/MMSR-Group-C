@@ -1,0 +1,80 @@
+[
+
+  {
+    "Avg precision":0.4427283535,
+    "Avg recall":0.0009680158,
+    "Avg ndcg":0.137259551,
+    "Avg genre diversity":5.0577524496,
+    "Genre coverage":1.0
+  },
+  {
+    "Avg precision":0.5022983951,
+    "Avg recall":0.0015922093,
+    "Avg ndcg":0.1777949682,
+    "Avg genre diversity":4.8363723809,
+    "Genre coverage":0.9334532374
+  },
+  {
+    "Avg precision":0.5109867248,
+    "Avg recall":0.0013432921,
+    "Avg ndcg":0.1714998304,
+    "Avg genre diversity":4.9726226662,
+    "Genre coverage":0.9811151079
+  },
+  {
+    "Avg precision":0.5522785813,
+    "Avg recall":0.001854712,
+    "Avg ndcg":0.2018377325,
+    "Avg genre diversity":4.8868134942,
+    "Genre coverage":0.9127697842
+  },
+  {
+    "Avg precision":0.5885476521,
+    "Avg recall":0.0017947373,
+    "Avg ndcg":0.2256941003,
+    "Avg genre diversity":4.7436668296,
+    "Genre coverage":0.9811151079
+  },
+  {
+    "Avg precision":0.624004359,
+    "Avg recall":0.0019679607,
+    "Avg ndcg":0.2428326958,
+    "Avg genre diversity":4.7137773773,
+    "Genre coverage":0.9973021583
+  },
+  {
+    "Avg precision":0.5656231425,
+    "Avg recall":0.0017221896,
+    "Avg ndcg":0.218357464,
+    "Avg genre diversity":4.9050194843,
+    "Genre coverage":0.9991007194
+  },
+  {
+    "Avg precision":0.5083514959,
+    "Avg recall":0.0014227316,
+    "Avg ndcg":0.1817986582,
+    "Avg genre diversity":4.9201418016,
+    "Genre coverage":0.9487410072
+  },
+  {
+    "Avg precision":0.542054686,
+    "Avg recall":0.0015590262,
+    "Avg ndcg":0.2130583971,
+    "Avg genre diversity":4.9673758619,
+    "Genre coverage":0.9676258993
+  },
+  {
+    "Avg precision":0.6047949277,
+    "Avg recall":0.0020530328,
+    "Avg ndcg":0.2319434204,
+    "Avg genre diversity":4.8389784302,
+    "Genre coverage":0.875
+  },
+  {
+    "Avg precision": 0.5208044382,
+    "Avg recall": 0.0013801503,
+    "Avg ndcg": 0.1773043223,
+    "Avg genre diversity": 4.9550537899,
+    "Genre coverage": 0.9838129496
+  }
+]
