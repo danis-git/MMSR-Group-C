@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "472349345875",
+    "project_id": "youtune-c98ba",
+    "storage_bucket": "youtune-c98ba.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472349345875:android:0d939d0e680ef476b35ea6",
+        "android_client_info": {
+          "package_name": "com.example.youtune"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2FTjXifuG4YmgBDymwERncSPoXHNRWoA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
