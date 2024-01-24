@@ -45,6 +45,6 @@ app.*.map.json
 
 # exclude the API key from version control
 env.g.dart
-
+.env.dev
 # exclude all .env files from source control
 *.env
